@@ -27,33 +27,36 @@ def qlearn(t, q, rewards, strategy):
     a reward, and `strategy` is a function Time -> Qvalues -> ActionNo.
     Return the chosen action and the new Q-values vector
     """
-    assert len(q) == len(rewards)
+    assert q.shape[1:] == rewards.shape
+
     # Estimate the average reward with arithmetic mean
-    avg_reward = (q[:, 1] / q[:, 0])
-    avg_reward[(q[:, 0] == 0)] = 0  # Overwrite div-by-0 errors
+    avg_reward = q[1] / q[0]
+    avg_reward[q[0] == 0] = 0  # Overwrite div-by-0 errors
     i = strategy(t, avg_reward)
-    res = 1 * q
-    res[i] += [1, rewards[i]]
+    ii = (i,) if '__iter__' not in dir(i) else i
+    res = q.copy()
+    res[(0,) + ii] += 1
+    res[(1,) + ii] += rewards[i]
     return i, res
 
 
-def simulate(mu, sigma, strategy, epochs=1000):
+def simulate(mu, sigma, strategy, epochs):
     """
     Perform a whole simulation for a single agent for a determined amount of
     `epochs`, and actions rewards of mean `mu` and stddev `sigma`. The number
     of actions is the length of mu and sigma.
     `strategy` is a function [Time -> Q-values -> Action-Number].
     """
-    assert len(mu) == len(sigma)
+    assert mu.shape == sigma.shape
 
-    q = np.zeros((epochs, len(mu), 2))
+    q = np.zeros((epochs, 2) + mu.shape)
     r = np.zeros(epochs)
     a = np.zeros(epochs)
+    rewards = np.random.normal(loc=mu, scale=sigma, size=(epochs,)+mu.shape)
 
     for t in range(epochs):
-        rewards = np.random.normal(loc=mu, scale=sigma)
-        a[t], q[t] = qlearn(t, q[max(0, t-1)], rewards, strategy)
-        r[t] = rewards[a[t]]
+        a[t], q[t] = qlearn(t, q[max(0, t-1)], rewards[t], strategy)
+        r[t] = rewards[t, a[t]]
 
     return r, a
 
@@ -64,16 +67,17 @@ def _simulate(_, *args, **kwargs):
     used for multiprocessing.Pool.map. Also avoid getting the random state
     inherited from parent process
     """
-    np.random.seed(int(100000 * time() * current_process().pid))
+    np.random.seed(int(100000 * time() * current_process().pid) & 0xffffffff)
     return simulate(*args, **kwargs)
 
 
-def multisim(mu, sigma, strategy, epochs=1000, runs=1000):
+def multisim(mu, sigma, strategy, epochs, runs):
     """
     Run simulate in parallel for `runs` different agents. Same arguments as
     simulate.
     """
-    workers = Pool(cpu_count())
     sim = partial(_simulate, mu=mu, sigma=sigma,
                   strategy=strategy, epochs=epochs)
+    workers = Pool(cpu_count())
     return np.array(zip(*workers.map(sim, range(runs))))
+    # return np.array(zip(*map(sim, range(runs))))
