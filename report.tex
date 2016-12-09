@@ -1,0 +1,107 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{float}
+
+\author{Titouan CHRISTOPHE\\\small 0529190 - VUB MA2 SOFT}
+\date{\today}
+\title{Learning Dynamics assignment 3\\\small Reinforcement Learning}
+
+\begin{document}
+\maketitle
+
+\section{Question 1: $n$-armed bandit}
+\subsection{Expected value for different strategies}
+
+\paragraph{Random}
+In this strategy, all actions are pulled randomly, with the same probability. Therefore, the expected reward at each turn is
+
+\begin{equation}
+E[R] = \frac{2.3 + 2.1 + 1.5 + 1.3}{4} = 1.8
+\label{eq:random}
+\end{equation}
+
+
+\paragraph{$\epsilon$-Greedy}
+\subparagraph{With $\epsilon = 0$}
+In this situation, the agent always chooses the action he thinks will provide the more rewards, and never explore randomly. This imply that the first action taken will be the only one taken during the whole game. In my implementation, the first action is choosed randomly (otherwise it would be always the first one), and therefore the expected value will be the mean of the choosen action reward.
+
+\subparagraph{With $\epsilon > 0$}
+In this situation, the agent takes a random action with probability $\epsilon$, and takes the best action the rest of the time. At the beginning, the agent will start with an expected value $E[G]$ somewhere between 1.8 and 2.3, and progressively reach its final value as he discovers new and better actions. The agent will therefore have a final expected reward of
+\begin{equation}
+E[G_{\epsilon}] = \epsilon \times E[R] + (1-\epsilon) \times 2.3
+\label{eq:greedy}
+\end{equation}
+
+This gives us:
+\begin{itemize}
+  \item{$E[G_{0.1}] = 2.25$}
+  \item{$E[G_{0.2}] = 2.19$}
+\end{itemize}
+
+
+\paragraph{$\tau$-Softmax}
+In this situation, the agent chooses a random a action, and the probability of choosing each one is calculated as a Boltzmann distribution of its expected return. We therefore have the following average expected value, for $n$ actions with average rewards $\mu_1, ..., \mu_{n}$:
+
+\begin{equation}
+E[S_{\tau}] = \sum_{i=1}^{n} \mu_{i} \frac{e^{\mu_i/\tau}}{\sum_{j=1}^{n} e^{\mu_j/\tau}}
+\label{eq:softmax}
+\end{equation}
+
+Which gives:
+\begin{itemize}
+  \item{$ E[S_{1}] = 1.96 $}
+  \item{$ E[S_{0.1}] = 2.28 $}
+\end{itemize}
+
+\subparagraph{Remarks}
+\begin{itemize}
+  \item When $\tau$ is large, $e^{\mu/\tau}$, approaches 1 for any $\mu$. Therefore, when the system is warm (high computational temperature $\tau$), all actions will have (nearly) equal probabilities. On the other hand if $\tau$ is very small, it  will give more importance to the learned values.
+  \item The same probability distribution happens at the beginning, when the estimation of $\mu_i$ by the agent has not been updated (they are initialized to zero).
+\end{itemize}
+
+\subsection{Simulation}
+On the following figures, the upper left graph represent the average reward over 1000 agents acting in a $4$-armed bandit problem. Each curve represent a different strategy used over 1100 epochs. At its right, a boxplot presents the average reward over all epochs and all agents. A second boxplot below similarly indicates the average reward over the last 100 runs, and therefore indicates how well the agents were performing after the learning phase. Below the main graph, there are 4 plots, 1 for each arm, indicating the frequency of this action for each strategy, using the same color code as above.
+
+\subsubsection{With initial parameters}
+\begin{figure}[H]
+  \center
+  \includegraphics[width=\textwidth]{Ex_1_1.pdf}
+  \caption{\label{fig:1.1} $\mu = (2.3, 2.1, 1.5, 1.3), \sigma = (0.9, 0.6, 0.4, 2)$}
+\end{figure}
+
+The experimental average reward for the random strategy is around 1.8 as in Equation \ref{eq:random}.
+
+\subsubsection{With doubled standard deviation}
+\begin{figure}[H]
+  \center
+  \includegraphics[width=\textwidth]{Ex_1_2.pdf}
+  \caption{\label{fig:1.2} $\mu = (2.3, 2.1, 1.5, 1.3), \sigma = (1.8, 1.2, 0.8, 4)$}
+\end{figure}
+
+On Figure \ref{fig:1.2},
+
+\subsection{Dynamic strategies}
+\subsubsection{With initial parameters}
+\begin{figure}[H]
+  \center
+  \includegraphics[width=\textwidth]{Ex_1_3_1.pdf}
+  \caption{\label{fig:1.3.1} $\mu = (2.3, 2.1, 1.5, 1.3), \sigma = (0.9, 0.6, 0.4, 2)$}
+\end{figure}
+
+On Figure \ref{fig:1.3.1}, we can observe the 
+
+\subsubsection{With doubled standard deviation}
+\begin{figure}[H]
+  \center
+  \includegraphics[width=\textwidth]{Ex_1_3_2.pdf}
+  \caption{\label{fig:1.3.2} $\mu = (2.3, 2.1, 1.5, 1.3), \sigma = (1.8, 1.2, 0.8, 4)$}
+\end{figure}
+
+On Figure \ref{fig:1.3.2},
+
+\section{Exercise 2}
+
+\end{document}
