@@ -1,21 +1,16 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 from time import time
+from plot import plt, show
 
-from simulate import partial, multisim
+from simulate import multistrat, multisim, simulate
 from strategies import (
-    random,
+    partial, random,
     fixed_greedy, dynamic_greedy,
     fixed_softmax, dynamic_softmax)
 
 
 # Hi-lvl helpers
-def multistrat(mu, sigma, strategies, epochs, runs):
-    sim = partial(multisim, mu=mu, sigma=sigma, epochs=epochs, runs=runs)
-    return np.array([sim(strategy=s) for s in strategies])
-
-
 def multiplot(A, R, strats):
     colors = 'kgrcmyb'
     nA = int(A.max() + 1)
@@ -54,15 +49,12 @@ def multiplot(A, R, strats):
 
 def demo(name, mu, sigma, strategies):
     t0 = time()
-    results = multistrat(mu=mu, sigma=sigma,
-                         strategies=strategies,
-                         epochs=1100, runs=1000)
-
-    R, A = np.array(zip(*results))
+    R, A = multistrat(mu=mu, sigma=sigma,
+                      strategies=strategies, epochs=1100)
     multiplot(A, R, strategies)
-    plt.savefig(name.replace(' ', '_') + '.pdf')
-    # plt.show()
+    show(name.replace(' ', '_'))
     print name, "ran in", time()-t0, "s"
+
 
 if __name__ == "__main__":
     mu, sigma = np.array([[2.3, 2.1, 1.5, 1.3], [0.9, 0.6, 0.4, 2]])

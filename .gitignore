@@ -1,1 +1,5 @@
 *.pyc
+*.aux
+*.log
+*.toc
+local_config.py
