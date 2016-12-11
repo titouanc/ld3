@@ -78,17 +78,25 @@ On the following figures, the upper left graph represent the average reward over
 
 The experimental average reward for the random strategy is around 1.8 as in Equation \ref{eq:random}. The $\epsilon$-Greedy strategies for $\epsilon \neq 0$, and the 1-softmax reach their theoretical values as well.
 
+\paragraph{0-Greedy}
+In this special case, the agent will pick a random action first, then always play the best action he knows. Most of the time, it will be the first action it picked (because he assumes a return of 0 for the other actions); but in some cases, if he picks the fourth action, he may receive a negative reward, and therefore he will pick the first action (this is because we use \texttt{numpy.argmax}\footnote{https://docs.scipy.org/doc/numpy-1.10.0/reference/generated/numpy.argmax.html: "In case of multiple occurrences of the maximum values, the indices corresponding to the first occurrence are returned."}), because it has an expected return of 0, which is greater than a negative value. We therefore observe a better-than-random performance for this strategy.
+
+\paragraph{0.1-Softmax}
+Using a fixed low temperature, once the agent has picked the first action, the probability for this action will be very much higher than for the others. As an example, if the agent choose the fourth action, and has a reward equals to the average reward of this action, the probability for this action will become:
+
+$$ \frac{e^{1.3/0.1}}{3 + e^{1.3/0.1}} > 0.99 $$
+
+The agent will therefore be very unlikely to pick another action, and this get accentuated with actions with a higher reward. However, if at the first epoch he choosed a negative reward, he switches to another action, as the probability for this action will become very low (less than 1\%)
+
 \begin{figure}[H]
   \center
   \includegraphics[width=\textwidth]{Ex_1_1-q.pdf}
   \caption{\label{fig:1.1q} Expected rewards for Figure \ref{fig:1.1}}
 \end{figure}
 
-On Figure \ref{fig:1.1q}, we observe the values 
+On Figure \ref{fig:1.1q}, we observe the average expected value of each action, for the different strategies. This value is estimated as an arithmetic mean of all the rewards from this action. The dashed blue line indicates the actual reward mean.
 
-\paragraph{0-Greedy}
-
-\paragraph{0.1-Softmax}
+The 0-Greedy and 0.1-Softmax have erronated expected values, because they have been averaged over several runs, where different agents always took the same action. We clearly see that nonzero Greedy strategies quickly have a good estimation of the best action, but the estimator for other actions take time to converge. This is even worse for Softmax strategies.
 
 \subsubsection{With doubled standard deviation}
 \begin{figure}[H]
@@ -104,6 +112,8 @@ On Figure \ref{fig:1.2}, we observe the same behaviours as in Figure \ref{fig:1.
   \includegraphics[width=\textwidth]{Ex_1_2-q.pdf}
   \caption{\label{fig:1.2q} Expected rewards for Figure \ref{fig:1.2}}
 \end{figure}
+
+A very interesting thing in Figure \ref{fig:1.2q} is that the 1-Softmax strategy quickly converge to the actual value of the best action (though it takes about 4 times longer than with the initial stddev), but for the other actions, it may actually underestimate them (see Action 3).
 
 \subsection{Dynamic strategies}
 In this section, we will look at dynamic strategies, where the selected action also depends on the actual epoch. In Figure \ref{fig:timevar}, we provide a graphic representation of the evolution of those dynamic parameters over time.
@@ -126,11 +136,15 @@ Figure \ref{fig:1.3.1} is the justification for 1100 epochs (instead of the 1000
 
 $$ \tau = 4 \times \frac{\max(1, 1000-t)}{1000} $$
 
+An interesting thing to notice is how the agent keep mixing actions 1 and 2 (the 2 bests) while decreasing the use of action 3 and 4, and only definitely choose action 1 at the very end. Over the whole simulation, the Greedy implementation provide more reward, but the softmax reaches a better instantaneous reward at the end. The Greedy implementation would therefore be suited to an online algorithm that cannot be trained beforehand, while the Softmax version would provide better performance once it has been trained.
+
 \begin{figure}[H]
   \center
   \includegraphics[width=\textwidth]{Ex_1_3_1-q.pdf}
   \caption{\label{fig:1.3.1q} Expected rewards for Figure \ref{fig:1.3.1}}
 \end{figure}
+
+On Figure \ref{fig:1.3.1q}, we see that the agent estimate converges even more quickly to the actual reward. In the dynamic Greedy, it translates into an immediate very good reward, but for the Greedy implementation, it will only be useful when the temperature decreasing period is nearly over.
 
 \subsubsection{With doubled standard deviation}
 \begin{figure}[H]
@@ -139,13 +153,13 @@ $$ \tau = 4 \times \frac{\max(1, 1000-t)}{1000} $$
   \caption{\label{fig:1.3.2} $\mu = (2.3, 2.1, 1.5, 1.3), \sigma = (1.8, 1.2, 0.8, 4)$}
 \end{figure}
 
-On Figure \ref{fig:1.3.2},
-
 \begin{figure}[H]
   \center
   \includegraphics[width=\textwidth]{Ex_1_3_2-q.pdf}
   \caption{\label{fig:1.3.2q} Expected rewards for Figure \ref{fig:1.3.2}}
 \end{figure}
+
+In Figure \ref{fig:1.3.2} and \ref{fig:1.3.2q}, we see that the Softmax implementation still underestimates the fourth action, but the effect is much lower than with a fixed temperature. With the doubled variance, the agent takes more time to estimate the actual rewards, but the dynamic temperature clearly helps. However the dynamic Greedy has much more difficulties to converge to the actual reward value.
 
 \section{Exercise 2}
 \subsection{Simulations}
