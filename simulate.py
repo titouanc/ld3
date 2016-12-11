@@ -9,7 +9,7 @@ from local_config import PARALLEL, RUNS
 np.seterr('ignore')
 
 
-def qlearn(t, q, rewards, strategy):
+def qlearn(t, q, max_q, rewards, strategy):
     """
     Perform a single action, at time `t` and with Q-value `q`. Each action has
     a reward, and `strategy` is a function Time -> Qvalues -> ActionNo.
@@ -20,11 +20,13 @@ def qlearn(t, q, rewards, strategy):
     # Estimate the average reward with arithmetic mean
     avg_reward = q[1] / q[0]
     avg_reward[q[0] == 0] = 0  # Overwrite div-by-0 errors
-    i = strategy(t, avg_reward, q[0])
+    i = strategy(t, avg_reward, q[0], max_q)
     res = q.copy()
     res[0][i] += 1
     res[1][i] += rewards[i]
-    return i, res
+    if rewards[i] > max_q[i]:
+        max_q[i] = rewards[i]
+    return i, res, max_q
 
 
 def simulate(mu, sigma, strategy, epochs):
@@ -40,9 +42,11 @@ def simulate(mu, sigma, strategy, epochs):
     r = np.zeros(epochs)
     a = np.zeros((epochs, len(mu.shape)))
     rewards = np.random.normal(loc=mu, scale=sigma, size=(epochs,)+mu.shape)
+    max_q = np.zeros(mu.shape)
 
     for t in range(epochs):
-        a[t], q[t] = qlearn(t, q[max(0, t-1)], rewards[t], strategy)
+        a[t], q[t], max_q = qlearn(t, q[max(0, t-1)], max_q,
+                                   rewards[t], strategy)
         r[t] = rewards[t][tuple(a[t])]
 
     return r, a

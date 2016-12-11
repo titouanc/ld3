@@ -63,7 +63,7 @@ Which gives:
 \end{itemize}
 
 \subsection{Simulation}
-On the following figures, the upper left graph represent the average reward over 1000 agents acting in a $4$-armed bandit problem. Each curve represent a different strategy used over 1100 epochs. At its right, a boxplot presents the average reward over all epochs and all agents. A second boxplot below similarly indicates the average reward over the last 100 runs, and therefore indicates how well the agents were performing after the learning phase. Below the main graph, there are 4 plots, 1 for each arm, indicating the frequency of this action for each strategy, using the same color code as above.
+On the following figures, the upper left graph represent the average reward over 1000 agents acting in a $4$-armed bandit problem. Each curve represent a different strategy used over 1100 epochs. At its right, a boxplot presents the average reward over all epochs and all agents. A second boxplot below similarly indicates the average reward over the last 100 epochs, and therefore indicates how well the agents were performing after the learning phase. Below the main graph, there are 4 plots, 1 for each arm, indicating the frequency of this action for each strategy, using the same color code as above.
 
 \subsubsection{With initial parameters}
 \begin{figure}[H]
@@ -72,7 +72,11 @@ On the following figures, the upper left graph represent the average reward over
   \caption{\label{fig:1.1} $\mu = (2.3, 2.1, 1.5, 1.3), \sigma = (0.9, 0.6, 0.4, 2)$}
 \end{figure}
 
-The experimental average reward for the random strategy is around 1.8 as in Equation \ref{eq:random}.
+The experimental average reward for the random strategy is around 1.8 as in Equation \ref{eq:random}. The $\epsilon$-Greedy strategies for $\epsilon \neq 0$, and the 1-softmax reach their theoretical values as well.
+
+\paragraph{0-Greedy}
+
+\paragraph{0.1-Softmax}
 
 \subsubsection{With doubled standard deviation}
 \begin{figure}[H]
@@ -81,7 +85,7 @@ The experimental average reward for the random strategy is around 1.8 as in Equa
   \caption{\label{fig:1.2} $\mu = (2.3, 2.1, 1.5, 1.3), \sigma = (1.8, 1.2, 0.8, 4)$}
 \end{figure}
 
-On Figure \ref{fig:1.2},
+On Figure \ref{fig:1.2}, we observe the same behaviours as in Figure \ref{fig:1.1}, however the agents take more time to have a good estimate of the best action. This also leads to a worse optimal action selection for the 0.1-Greedy algorithm, which was the best performer in the initial conditions. With the doubled standard deviation, the 0.2-Greedy strategy is not significantly worse than the 0.1-Greedy, and prefers more the second action to the first than the 0.1-Greedy.
 
 \subsection{Dynamic strategies}
 \subsubsection{With initial parameters}
@@ -91,7 +95,7 @@ On Figure \ref{fig:1.2},
   \caption{\label{fig:1.3.1} $\mu = (2.3, 2.1, 1.5, 1.3), \sigma = (0.9, 0.6, 0.4, 2)$}
 \end{figure}
 
-On Figure \ref{fig:1.3.1}, we can observe the 
+Figure \ref{fig:1.3.1} is the justification for 1100 epochs (instead of the 1000 proposed in the assignment). As the dynamic Greedy implementation decreases its 
 
 \subsubsection{With doubled standard deviation}
 \begin{figure}[H]
