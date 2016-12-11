@@ -78,6 +78,14 @@ On the following figures, the upper left graph represent the average reward over
 
 The experimental average reward for the random strategy is around 1.8 as in Equation \ref{eq:random}. The $\epsilon$-Greedy strategies for $\epsilon \neq 0$, and the 1-softmax reach their theoretical values as well.
 
+\begin{figure}[H]
+  \center
+  \includegraphics[width=\textwidth]{Ex_1_1-q.pdf}
+  \caption{\label{fig:1.1q} Expected rewards for Figure \ref{fig:1.1}}
+\end{figure}
+
+On Figure \ref{fig:1.1q}, we observe the values 
+
 \paragraph{0-Greedy}
 
 \paragraph{0.1-Softmax}
@@ -90,6 +98,12 @@ The experimental average reward for the random strategy is around 1.8 as in Equa
 \end{figure}
 
 On Figure \ref{fig:1.2}, we observe the same behaviours as in Figure \ref{fig:1.1}, however the agents take more time to have a good estimate of the best action. This also leads to a worse optimal action selection for the 0.1-Greedy algorithm, which was the best performer in the initial conditions. With the doubled standard deviation, the 0.2-Greedy strategy is not significantly worse than the 0.1-Greedy, and has a weaker preference for the second action over the first, which best fits the bandits rewards.
+
+\begin{figure}[H]
+  \center
+  \includegraphics[width=\textwidth]{Ex_1_2-q.pdf}
+  \caption{\label{fig:1.2q} Expected rewards for Figure \ref{fig:1.2}}
+\end{figure}
 
 \subsection{Dynamic strategies}
 In this section, we will look at dynamic strategies, where the selected action also depends on the actual epoch. In Figure \ref{fig:timevar}, we provide a graphic representation of the evolution of those dynamic parameters over time.
@@ -112,7 +126,11 @@ Figure \ref{fig:1.3.1} is the justification for 1100 epochs (instead of the 1000
 
 $$ \tau = 4 \times \frac{\max(1, 1000-t)}{1000} $$
 
-
+\begin{figure}[H]
+  \center
+  \includegraphics[width=\textwidth]{Ex_1_3_1-q.pdf}
+  \caption{\label{fig:1.3.1q} Expected rewards for Figure \ref{fig:1.3.1}}
+\end{figure}
 
 \subsubsection{With doubled standard deviation}
 \begin{figure}[H]
@@ -122,6 +140,12 @@ $$ \tau = 4 \times \frac{\max(1, 1000-t)}{1000} $$
 \end{figure}
 
 On Figure \ref{fig:1.3.2},
+
+\begin{figure}[H]
+  \center
+  \includegraphics[width=\textwidth]{Ex_1_3_2-q.pdf}
+  \caption{\label{fig:1.3.2q} Expected rewards for Figure \ref{fig:1.3.2}}
+\end{figure}
 
 \section{Exercise 2}
 \subsection{Simulations}

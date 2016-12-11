@@ -49,7 +49,7 @@ def simulate(mu, sigma, strategy, epochs):
                                    rewards[t], strategy)
         r[t] = rewards[t][tuple(a[t])]
 
-    return r, a
+    return q, r, a
 
 
 def _simulate(_, *args, **kwargs):
@@ -76,8 +76,8 @@ def multisim(mu, sigma, strategy, epochs, runs=RUNS):
         res = workers.map(sim, range(runs))
     else:
         res = map(sim, range(runs))
-    R, A = zip(*res)
-    return np.array(R), np.array(A)
+    Q, R, A = zip(*res)
+    return tuple(np.array(x) for x in (Q, R, A))
 
 
 def multistrat(mu, sigma, strategies, epochs, runs=RUNS):
@@ -85,5 +85,5 @@ def multistrat(mu, sigma, strategies, epochs, runs=RUNS):
     Like multisim, but for multiple strategies
     """
     sim = partial(multisim, mu=mu, sigma=sigma, epochs=epochs, runs=runs)
-    R, A = zip(*[sim(strategy=s) for s in strategies])
-    return np.array(R), np.array(A)
+    Q, R, A = zip(*[sim(strategy=s) for s in strategies])
+    return tuple(np.array(x) for x in (Q, R, A))

@@ -9,10 +9,11 @@ from strategies import (
     fixed_greedy, dynamic_greedy,
     fixed_softmax, dynamic_softmax)
 
+colors = 'kgrcmyb'
+
 
 # Hi-lvl helpers
 def multiplot(A, R, strats):
-    colors = 'kgrcmyb'
     nA = int(A.max() + 1)
     spec = GridSpec(nA+1, 2, width_ratios=[4, 1], height_ratios=[3]+[1]*nA)
     fig = plt.figure(figsize=(12, 12))
@@ -47,14 +48,31 @@ def multiplot(A, R, strats):
     plt.title("Last 100 epochs")
 
 
+def plot_qs(Q, mu, strats):
+    spec = GridSpec(4, 1)
+    fig = plt.figure(figsize=(12, 12))
+    for i in range(4):
+        fig.add_subplot(spec[i])
+        for s, strat in enumerate(strats):
+            q = Q[s, :, :, 1, i] / Q[s, :, :, 0, i]
+            q[Q[s, :, :, 0, i] == 0] = 0
+            plt.plot(q.mean(axis=0), label=strat.__name__, c=colors[s])
+        plt.axhline(mu[i], ls='--')
+        plt.ylabel("Estimated value of\nAction {}".format(i))
+        plt.legend(framealpha=0.5, fontsize=10)
+
+
 def demo(name, mu, sigma, strategies):
     t0 = time()
-    R, A = multistrat(mu=mu, sigma=sigma,
-                      strategies=strategies, epochs=1100)
+    Q, R, A = multistrat(mu=mu, sigma=sigma,
+                         strategies=strategies, epochs=1100)
     multiplot(A, R, strategies)
     plt.ylim(1)
     print name, "ran in", time()-t0, "s"
     show(name.replace(' ', '_'))
+
+    plot_qs(Q, mu, strategies)
+    show(name.replace(' ', '_')+"-q")
 
 
 if __name__ == "__main__":
