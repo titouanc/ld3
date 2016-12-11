@@ -22,7 +22,7 @@ if __name__ == "__main__":
         Strat2D(partial(fixed_softmax, i)) for i in [1, 0.1, 0.01]
     ]
 
-    spec = GridSpec(1, 2)
+    spec = GridSpec(1, 2, width_ratios=[4, 1])
 
     colors = "rgbky"
 

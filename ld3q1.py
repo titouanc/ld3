@@ -52,8 +52,9 @@ def demo(name, mu, sigma, strategies):
     R, A = multistrat(mu=mu, sigma=sigma,
                       strategies=strategies, epochs=1100)
     multiplot(A, R, strategies)
-    show(name.replace(' ', '_'))
+    plt.ylim(1)
     print name, "ran in", time()-t0, "s"
+    show(name.replace(' ', '_'))
 
 
 if __name__ == "__main__":
