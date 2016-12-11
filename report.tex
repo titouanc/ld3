@@ -163,11 +163,41 @@ In Figure \ref{fig:1.3.2} and \ref{fig:1.3.2q}, we see that the Softmax implemen
 
 \section{Exercise 2}
 \subsection{Simulations}
+For the Climbing Game, I choosed to use the FQM heuristic, presented in \cite{Kapetanakis2005} with a temperature decaying Boltzman selection. In addition, the minimal temperature is also parametrizable. Therefore, we have the following parametrization:
+
+\begin{itemize}
+  \item $\tau_0$ which is the initial temperature (at epoch 0)
+  \item $\tau_N$ ; the minimal temperature (at epoch $N$)
+  \item $c$; the factor of maximum frequency expectation
+  \item $s$; the decay factor
+\end{itemize}
+
+such that
+
+$$\tau(t) = e^{-st}\tau_0 + \tau_N$$
+
+and
+
+$$EV(a) = Q(a) + c \times \frac{\max(Q(a))}{count(a)}$$
+
+As the reward is stochastic, the absolute frequency of the maximum observed reward is always 1, therefore this formula is equivalent to the original FMQ. We then choose a random action at epoch $t$ with probability
+
+$$SOFTMAX_{\tau(t)}(EV(a_t))$$
+
+On the graphs below, we see the average reward for 1000 pairs of agents playing the climbing game. At each turn, they both receive the same stochastic reward, drawn from normal distributions. On the right boxplot, we compare the overall average reward for the different strategies. We compare 5 different strategies: 2 FMQ with different parametrizations, but with the same initial temperature of 10, and 3 fixed softmaxes.
+
+\paragraph{Computing Q for each player}
+The expected reward $Q$ for each action of each player is computed as the arithmetic mean of the rewards he got using this action for all the action of its opponent, weighted by the average times the opponent played the action.
+
 \begin{figure}[H]
   \center
   \includegraphics[width=\textwidth]{Ex_2_sigma1.pdf}
   \caption{\label{fig:2.1} $(\sigma, \sigma_{0}, \sigma_{1}) = (0.2, 0.2, 0.2)$}
 \end{figure}
+
+On Figure \ref{fig:2.1}, we see that the FMQ heuristic allows to find the optimum very quickly, and then to stay all the time in this configuration. With a small expectation coefficient, but high decaying factor (red curve), most of the pairs reach the best configuration in the earliest epochs, then the remaining pairs discover the good equilibrium. After 5000 epochs, all the playing pairs reached the optimum. Using a high expectation coefficient $c$, but slower decay rate (green curve), the players first reach the suboptimal pair of actions $(a_2, b_2)$ with an expected reward of 7, then jump together to the optimum. According to \cite{Kapetanakis2005}, the $c$ coefficient does not influence that much on the outcome of the algorithm, and this is what we observe here. Here, both agents take a decision based on the average expected reward, and the maximum average reward per action; this is why they tend to discover the optimum very quickly.
+
+If we have a constant temperature of 1 (blue curve), the agents get stucked in the lower right square: as the agents are considering only the average reward so far per action, they are unlikely to choose $a_1$ or $b_1$, as the expected payoff is low. If we further lower the fixed temperature (yellow and black curves), the system never evolves.
 
 \begin{figure}[H]
   \center
@@ -181,7 +211,29 @@ In Figure \ref{fig:1.3.2} and \ref{fig:1.3.2q}, we see that the Softmax implemen
   \caption{\label{fig:2.3} $(\sigma, \sigma_{0}, \sigma_{1}) = (0.1, 0.1, 0.4)$}
 \end{figure}
 
-\subsection{}
+We see no behavioral difference in the two others standard deviation configurations, apart from the observed reward being more noisy. We formulate 2 hypothesis:
+
+\begin{itemize}
+  \item Our agent (let's call him Agent Smith, he is such a good performer) is very good at learning, and he legitimately beats the game
+  \item Our implementation has a bug
+\end{itemize}
+
+\subsection{Open questions}
+\subsubsection{How will the learning process change if we make the agents independent learners?}
+In this configuration, the agents only compute their expected rewards on their single action, and only learn 3 values instead of 9 in our case. It would eventually converge to the optimum, but slower than with Joint Action Learners. However, this allow to play in games where the opponent action and reward is not known, and simplify asymetric strategies (where the two players play differently).
+
+\subsubsection{How will the learning process change if we make the agents always select the action that according to them will yield the highest reward (assuming the other agent plays the best response)?}
+This is the 0-Greedy strategy we observed in the first exercise. If they don't explore enough, they might not find the best response for the opponent, and miss the optimum.
+
+\section{Code}
+The code to run the simulation has been written in Python, using Numpy and Matplotlib. It is provided in the following files:
+
+\begin{itemize}
+  \item \textbf{strategies.py}: The different strategies: functions that given a Q state and the actual epoch, return the index of the action to perform
+  \item \textbf{simulate.py}: Function to perform a single step of the game, a simulation (sequence of steps), and run many of them with different strategies in parallel.
+  \item \textbf{local\_config.py} and \textbf{plot.py}: Functions to configure the simulation (interactive plot or write to file, number of runs to perform, ...)
+  \item \textbf{ld3q\{1,2\}.py}: The specific code for Exercise 1 and 2 and their plots.
+\end{itemize}
 
 \bibliography{report}
 
